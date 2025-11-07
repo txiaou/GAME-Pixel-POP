@@ -1,0 +1,5 @@
+{
+  "name": "Pixel Monster Popper",
+  "description": "A fun pixel-art style game where you operate a bubble machine. Each bubble you shoot pops to reveal a random, cute little monster.",
+  "requestFramePermissions": []
+}

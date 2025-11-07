@@ -3,9 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pixel Monster Popper</title>
+    <title>Bubble Popper Fun</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
+      body {
+        font-family: 'Press Start 2P', cursive;
+        background-color: #1a1a1a;
+        background-image:
+          linear-gradient(rgba(0,0,0,0.3) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0,0,0,0.3) 1px, transparent 1px);
+        background-size: 4px 4px;
+        color: #e0e0e0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+      }
+      #root {
+        width: 100%;
+        height: 100%;
+        max-width: 480px; /* Typical mobile width */
+        max-height: 900px; /* Typical mobile height */
+        position: relative;
+        image-rendering: pixelated;
+      }
       @keyframes shake {
         10%, 90% { transform: translate3d(-1px, 0, 0); }
         20%, 80% { transform: translate3d(2px, 0, 0); }
@@ -24,9 +50,17 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        border-radius: 50%;
+        border-radius: 0; /* Changed to square */
         animation: explode 0.5s ease-out forwards;
         border-style: solid;
+        box-shadow: 0 0 5px currentColor;
+      }
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+      }
+      .animate-pulse-bubble {
+        animation: pulse 1s steps(2, jump-none) infinite;
       }
     </style>
   <script type="importmap">
@@ -39,7 +73,7 @@
 }
 </script>
 </head>
-  <body class="bg-gray-900">
+  <body>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

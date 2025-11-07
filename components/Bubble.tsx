@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef } from 'react';
 import { Bubble as BubbleType } from '../types';
 
 interface BubbleProps {
@@ -7,7 +7,7 @@ interface BubbleProps {
   onRemove: (id: number) => void;
 }
 
-export const Bubble: React.FC<BubbleProps> = ({ bubble, onPop, onRemove }) => {
+export const Bubble = forwardRef<HTMLDivElement, BubbleProps>(({ bubble, onPop, onRemove }, ref) => {
   const [isRising, setIsRising] = useState(false);
 
   useEffect(() => {
@@ -37,25 +37,27 @@ export const Bubble: React.FC<BubbleProps> = ({ bubble, onPop, onRemove }) => {
 
   return (
     <div
+      ref={ref}
       onClick={handleClick}
       className="absolute bottom-24 transition-transform ease-out cursor-pointer"
+      data-id={bubble.id}
+      data-color={bubble.type === 'normal' ? bubble.color : ''}
+      data-type={bubble.type}
       style={{
         left: `${bubble.x}%`,
-        transform: `translateX(-50%) translateY(${isRising ? `-${(window.innerHeight * bubble.travelDist) / 100}px` : '0'})`,
+        transform: `translateX(-50%) translateY(${isRising ? `-${(window.innerHeight * bubble.travelDist) / 100}px` : '0'}) scale(${isRising ? 1 : 0.2})`,
         transitionDuration: `${bubble.duration}ms`,
       }}
     >
       <div 
-        className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center animate-pulse"
+        className="w-12 h-12 sm:w-16 sm:h-16"
         style={{
-            backgroundColor: `${bubble.color}4D`, // ~30% opacity
-            borderColor: `${bubble.color}CC`, // ~80% opacity
-            borderWidth: '2px',
-            borderStyle: 'solid',
+            backgroundColor: bubble.color,
+            border: `4px solid #1a1a1a`,
+            boxShadow: `inset 0 0 0 1px #fff`,
         }}
       >
-        <div className="w-4 h-4 rounded-full bg-white/70 self-start mt-2 ml-4 transform -translate-x-1/2"></div>
       </div>
     </div>
   );
-};
+});

@@ -1,8 +1,8 @@
 export enum MonsterType {
-  Ginger,
-  Gray,
-  Black,
-  White,
+  ScrapBot,
+  MutantCritter,
+  GlowSlug,
+  Eyebot,
 }
 
 export interface Bubble {
@@ -12,6 +12,14 @@ export interface Bubble {
   type: 'normal' | 'bomb';
   color: string;
   travelDist: number;
+}
+
+export interface LargeBubble {
+  id: number;
+  x: number;
+  y: number;
+  type: 'large';
+  color: string;
 }
 
 export interface Monster {
@@ -25,4 +33,11 @@ export interface Bomb {
   id: number;
   x: number;
   y: number;
+}
+
+export interface Candy {
+  id: number;
+  x: number;
+  y: number;
+  color: string;
 }

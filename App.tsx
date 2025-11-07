@@ -8,6 +8,7 @@ const App: React.FC = () => {
   const [bubbles, setBubbles] = useState<BubbleType[]>([]);
   const [monsters, setMonsters] = useState<MonsterType[]>([]);
   const [isShooting, setIsShooting] = useState(false);
+  const [gingerCatCount, setGingerCatCount] = useState(0);
 
   const handleShoot = useCallback(() => {
     if (isShooting) return;
@@ -36,6 +37,10 @@ const App: React.FC = () => {
     ) as MonsterEnum[];
     const randomType = monsterTypes[Math.floor(Math.random() * monsterTypes.length)];
 
+    if (randomType === MonsterEnum.Ginger) {
+      setGingerCatCount((prevCount) => prevCount + 1);
+    }
+
     const newMonster: MonsterType = {
       id: Date.now(),
       x,
@@ -56,9 +61,15 @@ const App: React.FC = () => {
   return (
     <main className="relative w-screen h-screen overflow-hidden bg-gray-900 font-mono select-none">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMjcyNzJhIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
+      
       <div className="absolute top-4 left-4 sm:top-8 sm:left-8 text-white p-4 bg-black/30 rounded-lg">
         <h1 className="text-2xl sm:text-4xl font-bold tracking-widest text-cyan-300">PIXEL POP</h1>
         <p className="text-sm sm:text-base text-gray-300">Click the bubbles to pop a surprise!</p>
+      </div>
+
+      <div className="absolute top-4 right-4 sm:top-8 sm:right-8 text-white p-4 bg-black/30 rounded-lg text-right">
+        <h2 className="text-lg sm:text-xl font-bold tracking-wider text-amber-400">抓到黄色的猫猫</h2>
+        <p className="text-4xl sm:text-5xl font-bold text-white mt-1">{gingerCatCount}</p>
       </div>
 
       {bubbles.map((bubble) => (

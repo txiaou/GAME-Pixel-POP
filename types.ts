@@ -9,6 +9,7 @@ export interface Bubble {
   id: number;
   x: number;
   duration: number;
+  type: 'normal' | 'bomb';
 }
 
 export interface Monster {

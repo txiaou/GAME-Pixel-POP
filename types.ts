@@ -1,8 +1,8 @@
 export enum MonsterType {
-  Slime,
-  Bat,
-  Ghost,
-  Cyclops,
+  Ginger,
+  Gray,
+  Black,
+  White,
 }
 
 export interface Bubble {

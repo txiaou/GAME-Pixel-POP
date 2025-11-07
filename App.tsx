@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Bubble as BubbleType, Monster as MonsterType, MonsterType as MonsterEnum, Bomb as BombType } from './types';
 import { Bubble } from './components/Bubble';
 import { Monster } from './components/Monster';
@@ -10,6 +10,7 @@ type GameState = 'playing' | 'gameOver';
 
 const LEVEL_UP_SCORE = 5;
 const AVAILABLE_LEVELS = [1, 2];
+const BUBBLE_COLORS = ['#8be9fd', '#50fa7b', '#ffb86c', '#ff79c6', '#bd93f9']; // Cyan, Green, Orange, Pink, Purple
 
 const App: React.FC = () => {
   const [bubbles, setBubbles] = useState<BubbleType[]>([]);
@@ -34,26 +35,43 @@ const App: React.FC = () => {
   const transitionToLevel2 = useCallback(() => {
     selectLevel(2);
   }, [selectLevel]);
+  
+  // Automatic shooting logic
+  useEffect(() => {
+    if (gameState !== 'playing') return;
 
-  const handleShoot = useCallback(() => {
-    if (isShooting || gameState !== 'playing') return;
+    const shootInterval = setInterval(() => {
+      setIsShooting(true);
+      setIsShaking(true);
 
-    setIsShooting(true);
+      const bubbleCount = Math.floor(Math.random() * 2) + 1; // 1 or 2
+      const newBubbles: BubbleType[] = [];
 
-    const isBomb = level === 2 && Math.random() < 0.25; // 25% chance for a bomb in level 2
+      for (let i = 0; i < bubbleCount; i++) {
+          const isBomb = level === 2 && Math.random() < 0.25;
+          const randomColor = BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)];
+          
+          newBubbles.push({
+              id: Date.now() + i,
+              x: 20 + Math.random() * 60,
+              duration: 2000 + Math.random() * 2000,
+              type: isBomb ? 'bomb' : 'normal',
+              color: randomColor,
+          });
+      }
+      
+      setBubbles((prev) => [...prev, ...newBubbles]);
 
-    const newBubble: BubbleType = {
-      id: Date.now(),
-      x: 20 + Math.random() * 60,
-      duration: 2000 + Math.random() * 2000,
-      type: isBomb ? 'bomb' : 'normal',
-    };
-    setBubbles((prev) => [...prev, newBubble]);
+      setTimeout(() => {
+          setIsShooting(false);
+          setIsShaking(false);
+      }, 400);
 
-    setTimeout(() => {
-      setIsShooting(false);
-    }, 500);
-  }, [isShooting, gameState, level]);
+    }, 1500 + Math.random() * 1000); // Shoot every 1.5 - 2.5 seconds
+
+    return () => clearInterval(shootInterval);
+  }, [gameState, level]);
+
 
   const handlePop = useCallback((bubbleId: number, event: React.MouseEvent) => {
     const bubble = bubbles.find(b => b.id === bubbleId);
@@ -114,7 +132,7 @@ const App: React.FC = () => {
 
   return (
     <main className={`relative w-screen h-screen overflow-hidden bg-gray-900 font-mono select-none ${isShaking ? 'animate-shake' : ''}`}>
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMjcyNzJhIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMjcyNzJhIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
       
       <div className="absolute top-4 left-4 sm:top-8 sm:left-8 text-white p-4 bg-black/30 rounded-lg">
         <h1 className="text-2xl sm:text-4xl font-bold tracking-widest text-cyan-300">PIXEL POP</h1>
@@ -158,19 +176,6 @@ const App: React.FC = () => {
 
       <BubbleMachine isShooting={isShooting} />
 
-      <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-10">
-        <button
-          onClick={handleShoot}
-          disabled={isShooting || gameState !== 'playing'}
-          className={`px-8 py-4 text-xl font-bold text-white rounded-lg border-4 transition-all duration-200
-            ${isShooting || gameState !== 'playing'
-              ? 'bg-gray-600 border-gray-500 cursor-not-allowed' 
-              : 'bg-green-600 border-green-500 hover:bg-green-500 active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300'
-            }`}
-        >
-          {isShooting ? '...' : 'SHOOT'}
-        </button>
-      </div>
     </main>
   );
 };

@@ -44,7 +44,15 @@ export const Bubble: React.FC<BubbleProps> = ({ bubble, onPop, onRemove, travelD
         transitionDuration: `${bubble.duration}ms`,
       }}
     >
-      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center animate-pulse bg-cyan-400/30 border-2 border-cyan-200/80">
+      <div 
+        className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center animate-pulse"
+        style={{
+            backgroundColor: `${bubble.color}4D`, // ~30% opacity
+            borderColor: `${bubble.color}CC`, // ~80% opacity
+            borderWidth: '2px',
+            borderStyle: 'solid',
+        }}
+      >
         <div className="w-4 h-4 rounded-full bg-white/70 self-start mt-2 ml-4 transform -translate-x-1/2"></div>
       </div>
     </div>

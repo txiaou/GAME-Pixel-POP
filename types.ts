@@ -10,6 +10,7 @@ export interface Bubble {
   x: number;
   duration: number;
   type: 'normal' | 'bomb';
+  color: string;
 }
 
 export interface Monster {

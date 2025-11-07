@@ -40,7 +40,7 @@ const App: React.FC = () => {
   // Countdown logic
   useEffect(() => {
     if (gameState === 'countdown') {
-      const messages = ['3', '2', '1', '祝你好运'];
+      const messages = ['3', '2', '1'];
       let messageIndex = 0;
       setCountdownMessage(messages[messageIndex]);
 
@@ -79,6 +79,7 @@ const App: React.FC = () => {
               duration: 2000 + Math.random() * 2000,
               type: isBomb ? 'bomb' : 'normal',
               color: randomColor,
+              travelDist: 20 + Math.random() * 40, // Rise 20% to 60% of screen height
           });
       }
       
@@ -175,7 +176,7 @@ const App: React.FC = () => {
       </div>
 
       {gameState === 'playing' && bubbles.map((bubble) => (
-        <Bubble key={bubble.id} bubble={bubble} onPop={handlePop} onRemove={handleRemoveBubble} travelDist={75} />
+        <Bubble key={bubble.id} bubble={bubble} onPop={handlePop} onRemove={handleRemoveBubble} />
       ))}
       {monsters.map((monster) => (
         <Monster key={monster.id} monster={monster} onRemove={handleRemoveMonster} />
@@ -191,8 +192,9 @@ const App: React.FC = () => {
       )}
 
       {gameState === 'gameOver' && (
-        <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-20">
+        <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-20 text-center">
           <h2 className="text-7xl font-bold text-red-500 tracking-widest">GAME OVER</h2>
+          <p className="mt-6 text-3xl font-bold text-amber-400">你抓到了 {gingerCatCount} 只猫猫!</p>
           <button
             onClick={handleRestart}
             className="mt-8 px-8 py-4 text-xl font-bold text-white rounded-lg border-4 transition-all duration-200 bg-blue-600 border-blue-500 hover:bg-blue-500 active:bg-blue-700"

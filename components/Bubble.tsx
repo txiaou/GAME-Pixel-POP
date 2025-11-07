@@ -5,10 +5,9 @@ interface BubbleProps {
   bubble: BubbleType;
   onPop: (id: number, event: React.MouseEvent) => void;
   onRemove: (id: number) => void;
-  travelDist: number;
 }
 
-export const Bubble: React.FC<BubbleProps> = ({ bubble, onPop, onRemove, travelDist }) => {
+export const Bubble: React.FC<BubbleProps> = ({ bubble, onPop, onRemove }) => {
   const [isRising, setIsRising] = useState(false);
 
   useEffect(() => {
@@ -16,31 +15,33 @@ export const Bubble: React.FC<BubbleProps> = ({ bubble, onPop, onRemove, travelD
     const riseTimer = setTimeout(() => {
       setIsRising(true);
     }, 10);
+    
+    // After rising and hovering, the bubble should be removed
+    const hoverTime = 4000; // ms to hover
+    const lifespan = bubble.duration + hoverTime;
+    const removeTimer = setTimeout(() => {
+        onRemove(bubble.id);
+    }, lifespan);
+
 
     return () => {
       clearTimeout(riseTimer);
+      clearTimeout(removeTimer);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [bubble, onRemove]);
 
   const handleClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     onPop(bubble.id, event);
   };
 
-  const handleTransitionEnd = () => {
-    // When the bubble finishes its animation (reaches the top), remove it.
-    onRemove(bubble.id);
-  }
-
   return (
     <div
       onClick={handleClick}
-      onTransitionEnd={handleTransitionEnd}
       className="absolute bottom-24 transition-transform ease-out cursor-pointer"
       style={{
         left: `${bubble.x}%`,
-        transform: `translateX(-50%) translateY(${isRising ? `-${(window.innerHeight * travelDist) / 100}px` : '0'})`,
+        transform: `translateX(-50%) translateY(${isRising ? `-${(window.innerHeight * bubble.travelDist) / 100}px` : '0'})`,
         transitionDuration: `${bubble.duration}ms`,
       }}
     >

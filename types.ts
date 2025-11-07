@@ -11,6 +11,7 @@ export interface Bubble {
   duration: number;
   type: 'normal' | 'bomb';
   color: string;
+  travelDist: number;
 }
 
 export interface Monster {

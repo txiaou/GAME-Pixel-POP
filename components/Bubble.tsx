@@ -3,11 +3,12 @@ import { Bubble as BubbleType } from '../types';
 
 interface BubbleProps {
   bubble: BubbleType;
-  onPop: (id: number, x: number, y: number) => void;
+  onPop: (id: number, event: React.MouseEvent) => void;
+  onRemove: (id: number) => void;
   travelDist: number;
 }
 
-export const Bubble: React.FC<BubbleProps> = ({ bubble, onPop, travelDist }) => {
+export const Bubble: React.FC<BubbleProps> = ({ bubble, onPop, onRemove, travelDist }) => {
   const [isRising, setIsRising] = useState(false);
 
   useEffect(() => {
@@ -16,21 +17,27 @@ export const Bubble: React.FC<BubbleProps> = ({ bubble, onPop, travelDist }) => 
       setIsRising(true);
     }, 10);
 
-    // Trigger the pop event at the end of its lifespan
-    const popTimer = setTimeout(() => {
-      onPop(bubble.id, bubble.x, 100 - travelDist);
-    }, bubble.duration);
-
     return () => {
       clearTimeout(riseTimer);
-      clearTimeout(popTimer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bubble.id]);
+  }, []);
+
+  const handleClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    onPop(bubble.id, event);
+  };
+
+  const handleTransitionEnd = () => {
+    // When the bubble finishes its animation (reaches the top), remove it.
+    onRemove(bubble.id);
+  }
 
   return (
     <div
-      className="absolute bottom-24 transition-transform ease-out"
+      onClick={handleClick}
+      onTransitionEnd={handleTransitionEnd}
+      className="absolute bottom-24 transition-transform ease-out cursor-pointer"
       style={{
         left: `${bubble.x}%`,
         transform: `translateX(-50%) translateY(${isRising ? `-${(window.innerHeight * travelDist) / 100}px` : '0'})`,

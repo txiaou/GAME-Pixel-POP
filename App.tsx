@@ -25,8 +25,11 @@ const App: React.FC = () => {
     }, 500); // Cooldown to prevent spamming
   }, [isShooting]);
 
-  const handlePop = useCallback((bubbleId: number, x: number, y: number) => {
+  const handlePop = useCallback((bubbleId: number, event: React.MouseEvent) => {
     setBubbles((prev) => prev.filter((b) => b.id !== bubbleId));
+
+    const x = (event.clientX / window.innerWidth) * 100;
+    const y = (event.clientY / window.innerHeight) * 100;
 
     const monsterTypes = Object.values(MonsterEnum).filter(
       (v) => typeof v === 'number'
@@ -42,6 +45,10 @@ const App: React.FC = () => {
     setMonsters((prev) => [...prev, newMonster]);
   }, []);
 
+  const handleRemoveBubble = useCallback((bubbleId: number) => {
+    setBubbles((prev) => prev.filter((b) => b.id !== bubbleId));
+  }, []);
+
   const handleRemoveMonster = useCallback((monsterId: number) => {
     setMonsters((prev) => prev.filter((m) => m.id !== monsterId));
   }, []);
@@ -51,11 +58,11 @@ const App: React.FC = () => {
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMjcyNzJhIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
       <div className="absolute top-4 left-4 sm:top-8 sm:left-8 text-white p-4 bg-black/30 rounded-lg">
         <h1 className="text-2xl sm:text-4xl font-bold tracking-widest text-cyan-300">PIXEL POP</h1>
-        <p className="text-sm sm:text-base text-gray-300">Click the button to pop a surprise!</p>
+        <p className="text-sm sm:text-base text-gray-300">Click the bubbles to pop a surprise!</p>
       </div>
 
       {bubbles.map((bubble) => (
-        <Bubble key={bubble.id} bubble={bubble} onPop={handlePop} travelDist={75} />
+        <Bubble key={bubble.id} bubble={bubble} onPop={handlePop} onRemove={handleRemoveBubble} travelDist={75} />
       ))}
       {monsters.map((monster) => (
         <Monster key={monster.id} monster={monster} onRemove={handleRemoveMonster} />

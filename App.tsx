@@ -6,7 +6,7 @@ import { BubbleMachine } from './components/BubbleMachine';
 import { Bomb } from './components/Bomb';
 import { LevelSelector } from './components/LevelSelector';
 
-type GameState = 'playing' | 'gameOver';
+type GameState = 'playing' | 'gameOver' | 'countdown';
 
 const LEVEL_UP_SCORE = 5;
 const AVAILABLE_LEVELS = [1, 2];
@@ -19,8 +19,9 @@ const App: React.FC = () => {
   const [isShooting, setIsShooting] = useState(false);
   const [gingerCatCount, setGingerCatCount] = useState(0);
   const [level, setLevel] = useState(1);
-  const [gameState, setGameState] = useState<GameState>('playing');
+  const [gameState, setGameState] = useState<GameState>('countdown');
   const [isShaking, setIsShaking] = useState(false);
+  const [countdownMessage, setCountdownMessage] = useState<string>('3');
 
   const selectLevel = useCallback((level: number) => {
     setLevel(level);
@@ -28,13 +29,34 @@ const App: React.FC = () => {
     setBubbles([]);
     setMonsters([]);
     setBombs([]);
-    setGameState('playing');
+    setGameState('countdown');
     setIsShaking(false);
   }, []);
 
   const transitionToLevel2 = useCallback(() => {
     selectLevel(2);
   }, [selectLevel]);
+
+  // Countdown logic
+  useEffect(() => {
+    if (gameState === 'countdown') {
+      const messages = ['3', '2', '1', '祝你好运'];
+      let messageIndex = 0;
+      setCountdownMessage(messages[messageIndex]);
+
+      const interval = setInterval(() => {
+        messageIndex++;
+        if (messageIndex < messages.length) {
+          setCountdownMessage(messages[messageIndex]);
+        } else {
+          clearInterval(interval);
+          setGameState('playing');
+        }
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [gameState]);
   
   // Automatic shooting logic
   useEffect(() => {
@@ -48,12 +70,12 @@ const App: React.FC = () => {
       const newBubbles: BubbleType[] = [];
 
       for (let i = 0; i < bubbleCount; i++) {
-          const isBomb = level === 2 && Math.random() < 0.25;
+          const isBomb = level === 2 && Math.random() < 0.20; // Bomb probability reduced to 20%
           const randomColor = BUBBLE_COLORS[Math.floor(Math.random() * BUBBLE_COLORS.length)];
           
           newBubbles.push({
               id: Date.now() + i,
-              x: 20 + Math.random() * 60,
+              x: 30 + Math.random() * 40, // Spawn bubbles more centrally (30% to 70% of width)
               duration: 2000 + Math.random() * 2000,
               type: isBomb ? 'bomb' : 'normal',
               color: randomColor,
@@ -161,6 +183,12 @@ const App: React.FC = () => {
       {bombs.map((bomb) => (
         <Bomb key={bomb.id} bomb={bomb} onRemove={handleRemoveBomb} />
       ))}
+
+      {gameState === 'countdown' && (
+        <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-20">
+          <h2 className="text-9xl font-bold text-white tracking-widest animate-pulse">{countdownMessage}</h2>
+        </div>
+      )}
 
       {gameState === 'gameOver' && (
         <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-20">

@@ -1,28 +1,39 @@
 import React, { useState, useCallback } from 'react';
-import { Bubble as BubbleType, Monster as MonsterType, MonsterType as MonsterEnum } from './types';
+import { Bubble as BubbleType, Monster as MonsterType, MonsterType as MonsterEnum, Bomb as BombType } from './types';
 import { Bubble } from './components/Bubble';
 import { Monster } from './components/Monster';
 import { BubbleMachine } from './components/BubbleMachine';
+import { Bomb } from './components/Bomb';
+import { LevelSelector } from './components/LevelSelector';
 
 type GameState = 'playing' | 'gameOver';
 
 const LEVEL_UP_SCORE = 5;
+const AVAILABLE_LEVELS = [1, 2];
 
 const App: React.FC = () => {
   const [bubbles, setBubbles] = useState<BubbleType[]>([]);
   const [monsters, setMonsters] = useState<MonsterType[]>([]);
+  const [bombs, setBombs] = useState<BombType[]>([]);
   const [isShooting, setIsShooting] = useState(false);
   const [gingerCatCount, setGingerCatCount] = useState(0);
   const [level, setLevel] = useState(1);
   const [gameState, setGameState] = useState<GameState>('playing');
   const [isShaking, setIsShaking] = useState(false);
 
-  const transitionToLevel2 = useCallback(() => {
-    setLevel(2);
+  const selectLevel = useCallback((level: number) => {
+    setLevel(level);
     setGingerCatCount(0);
     setBubbles([]);
     setMonsters([]);
+    setBombs([]);
+    setGameState('playing');
+    setIsShaking(false);
   }, []);
+
+  const transitionToLevel2 = useCallback(() => {
+    selectLevel(2);
+  }, [selectLevel]);
 
   const handleShoot = useCallback(() => {
     if (isShooting || gameState !== 'playing') return;
@@ -49,17 +60,19 @@ const App: React.FC = () => {
     if (!bubble) return;
 
     setBubbles((prev) => prev.filter((b) => b.id !== bubbleId));
+    
+    const x = (event.clientX / window.innerWidth) * 100;
+    const y = (event.clientY / window.innerHeight) * 100;
 
     if (bubble.type === 'bomb') {
+      const newBomb: BombType = { id: Date.now(), x, y };
+      setBombs((prev) => [...prev, newBomb]);
       setGameState('gameOver');
       setIsShaking(true);
       setBubbles([]); // Clear all bubbles on explosion
-      setTimeout(() => setIsShaking(false), 500);
+      setTimeout(() => setIsShaking(false), 600); // Match shake animation duration
       return;
     }
-
-    const x = (event.clientX / window.innerWidth) * 100;
-    const y = (event.clientY / window.innerHeight) * 100;
 
     const monsterTypes = Object.values(MonsterEnum).filter(
       (v) => typeof v === 'number'
@@ -91,11 +104,12 @@ const App: React.FC = () => {
     setMonsters((prev) => prev.filter((m) => m.id !== monsterId));
   }, []);
 
+  const handleRemoveBomb = useCallback((bombId: number) => {
+    setBombs((prev) => prev.filter((b) => b.id !== bombId));
+  }, []);
+
   const handleRestart = () => {
-    setGameState('playing');
-    setGingerCatCount(0);
-    setBubbles([]);
-    setMonsters([]);
+    selectLevel(level);
   };
 
   return (
@@ -106,6 +120,12 @@ const App: React.FC = () => {
         <h1 className="text-2xl sm:text-4xl font-bold tracking-widest text-cyan-300">PIXEL POP</h1>
         <p className="text-sm sm:text-base text-gray-300">Level: {level}</p>
       </div>
+
+      <LevelSelector 
+        currentLevel={level}
+        onSelectLevel={selectLevel}
+        levels={AVAILABLE_LEVELS}
+      />
 
       <div className="absolute top-4 right-4 sm:top-8 sm:right-8 text-white p-4 bg-black/30 rounded-lg text-right">
         <h2 className="text-lg sm:text-xl font-bold tracking-wider text-amber-400">抓到黄色的猫猫</h2>
@@ -119,6 +139,9 @@ const App: React.FC = () => {
       ))}
       {monsters.map((monster) => (
         <Monster key={monster.id} monster={monster} onRemove={handleRemoveMonster} />
+      ))}
+      {bombs.map((bomb) => (
+        <Bomb key={bomb.id} bomb={bomb} onRemove={handleRemoveBomb} />
       ))}
 
       {gameState === 'gameOver' && (

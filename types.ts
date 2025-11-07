@@ -18,3 +18,9 @@ export interface Monster {
   y: number;
   type: MonsterType;
 }
+
+export interface Bomb {
+  id: number;
+  x: number;
+  y: number;
+}

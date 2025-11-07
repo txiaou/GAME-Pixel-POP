@@ -33,8 +33,6 @@ export const Bubble: React.FC<BubbleProps> = ({ bubble, onPop, onRemove, travelD
     onRemove(bubble.id);
   }
 
-  const isBomb = bubble.type === 'bomb';
-
   return (
     <div
       onClick={handleClick}
@@ -46,11 +44,7 @@ export const Bubble: React.FC<BubbleProps> = ({ bubble, onPop, onRemove, travelD
         transitionDuration: `${bubble.duration}ms`,
       }}
     >
-      <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center animate-pulse ${
-        isBomb
-          ? 'bg-gradient-to-br from-red-500 via-purple-500 to-yellow-500 border-2 border-red-300'
-          : 'bg-cyan-400/30 border-2 border-cyan-200/80'
-      }`}>
+      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center animate-pulse bg-cyan-400/30 border-2 border-cyan-200/80">
         <div className="w-4 h-4 rounded-full bg-white/70 self-start mt-2 ml-4 transform -translate-x-1/2"></div>
       </div>
     </div>

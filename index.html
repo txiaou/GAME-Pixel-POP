@@ -7,13 +7,26 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       @keyframes shake {
-        10%, 90% { transform: translate3d(-1px, 0, 0); }
-        20%, 80% { transform: translate3d(2px, 0, 0); }
-        30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-        40%, 60% { transform: translate3d(4px, 0, 0); }
+        10%, 90% { transform: translate3d(-2px, 0, 0); }
+        20%, 80% { transform: translate3d(4px, 0, 0); }
+        30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+        40%, 60% { transform: translate3d(8px, 0, 0); }
       }
       .animate-shake {
-        animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+      }
+      @keyframes explode {
+        0% { transform: scale(0.5); opacity: 1; }
+        100% { transform: scale(3); opacity: 0; }
+      }
+      .explosion-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        animation: explode 0.5s ease-out forwards;
+        border-style: solid;
       }
     </style>
   <script type="importmap">
